@@ -1,0 +1,16 @@
+<svg id="Logo_Full_Colour" data-name="Logo / Full Colour" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.127" y1="0.755" x2="1.067" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#0043ff"/>
+      <stop offset="1" stop-color="#a370f1"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="0.974" y1="-0.068" x2="0.114" y2="0.5" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#4bf2e6"/>
+      <stop offset="1" stop-color="#0065ff"/>
+    </linearGradient>
+  </defs>
+  <g id="C" transform="translate(0 0)">
+    <path id="C-2" data-name="C" d="M0-75.661A2.157,2.157,0,0,0,2.157-73.5H32L0-103.66Z" transform="translate(0 105.455)" fill="url(#linear-gradient)"/>
+    <path id="C-3" data-name="C" d="M0,2.157A2.157,2.157,0,0,1,2.157,0H32S3.73,25.767,1.226,28.234c-1.226,1.707.206,3.631.206,3.631A2.8,2.8,0,0,1,0,29.52Z" transform="translate(0 0)" opacity="0.983" fill="url(#linear-gradient-2)"/>
+  </g>
+</svg>

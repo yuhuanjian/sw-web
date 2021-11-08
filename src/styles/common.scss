@@ -1,0 +1,355 @@
+.action-wrap {
+    display: flex;
+    justify-content: space-between;
+    padding: 24px 30px 20px;
+    background-color: #fff;
+}
+
+.search-wrap {
+    padding: 24px 30px 0px;
+    margin-bottom: 0px;
+    background: #fff;
+}
+
+@page {
+    size: auto;
+    margin: 0;
+    size: A4 landscape;
+    /*portrait： 纵向打印,  landscape: 横向*/
+}
+
+// @media print {}
+.table-wrap {
+    margin-top: 0px;
+    padding: 0 30px;
+    background-color: #fff;
+    .ac-text {
+        margin: 0 10px;
+        color: #1890ff;
+        cursor: pointer;
+        &:first-child {
+            margin-left: 0;
+        }
+    }
+    .el-tabs__content {
+        height: calc(100% - 45px);
+        overflow: hidden;
+    }
+}
+
+.line-s {
+    width: 200%;
+    background-color: #F5F7F9;
+    height: 12px;
+    margin: 0 auto;
+    margin-left: -234px;
+    margin-top: 10px;
+}
+
+.search-wrap .el-form-item {
+    margin-bottom: 15px;
+}
+
+.sub-title-bar {
+    height: 70px;
+    line-height: 70px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.el-dialog__body {
+    padding-top: 0 !important;
+    padding-bottom: 10px !important;
+}
+
+.bot1 {
+    border-top: 1px solid #E8E8E8;
+}
+
+.bob1 {
+    border-bottom: 1px solid #E8E8E8;
+}
+
+.dashboard-container {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    ;
+    background-color: white;
+    .avatar-uploader .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
+        text-align: center;
+        border: 1px dashed #ccc;
+    }
+}
+
+.avatar-uploader .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+    border: 1px dashed #ccc;
+}
+
+.sub-title {
+    font-size: 18px;
+    padding-left: 5px;
+    margin-top: 16px;
+    color: #1f263e;
+    border-left: 2px solid #4285f4;
+}
+
+.info-wrap {
+    line-height: 24px;
+    color: rgba(0, 0, 0, 0.45);
+    .el-col {
+        margin: 26px 0;
+    }
+}
+
+.wrap-line {
+    background-color: #e8e8e8;
+}
+
+.mrb26 {
+    margin-bottom: 26px;
+}
+
+//element ui
+.el-dialog .el-dialog__footer {
+    padding-bottom: 30px;
+}
+
+.el-table--mini td,
+.el-table--mini th {
+    padding: 2px 0 !important;
+}
+
+.avatar-uploader .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+    border: 1px dashed #ccc;
+}
+
+@mixin line($num) {
+    color: #1f263e;
+    padding-left: 5px;
+    position: relative;
+    &:before {
+        content: "";
+        width: 2px;
+        height: #{$num}px;
+        display: block;
+        position: absolute;
+        transform: translateY(-50%);
+        top: 50%;
+        left: 0;
+        background-color: #4285f4;
+    }
+}
+
+.l14 {
+    @include line(14);
+}
+
+.l18 {
+    @include line(18);
+}
+
+@mixin status($statusColor) {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    margin-right: 10px;
+    background-color: $statusColor;
+}
+
+@mixin flex {
+    display: flex;
+    align-items: center;
+}
+
+@each $animal,
+$color in (f, #faad14),
+(s, #67c23a),
+(b, #1890FF),
+(r, #F5222D) {
+    .root-status-#{$animal} {
+        @include flex;
+        span {
+            @include status($color);
+        }
+    }
+}
+
+.disabled-from {
+    .el-select .el-input.is-disabled .el-input__inner,
+    .el-input.is-disabled .el-input__inner {
+        border: none;
+        color: #606266;
+        background-color: #fff;
+    }
+    .el-input__suffix {
+        display: none;
+    }
+}
+
+.el-input.is-disabled {
+    .el-input__inner {
+        border: none;
+        color: #606266 !important;
+        background-color: #fff !important;
+    }
+    .el-input__suffix {
+        display: none;
+    }
+}
+
+
+/*css主要部分的样式*/
+
+
+/*定义滚动条宽高及背景，宽高分别对应横竖滚动条的尺寸*/
+
+::-webkit-scrollbar {
+    width: 10px;
+    /*对垂直流动条有效*/
+    height: 10px;
+    /*对水平流动条有效*/
+    border-radius: 100%;
+}
+
+
+/*定义滚动条的轨道颜色、内阴影及圆角*/
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
+    background-color: #fff;
+    border-radius: 3px;
+}
+
+
+/*定义滑块颜色、内阴影及圆角*/
+
+::-webkit-scrollbar-thumb {
+    border-radius: 7px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: rgb(248, 248, 248);
+}
+
+
+/*定义两端按钮的样式*/
+
+::-webkit-scrollbar-button {
+    background-color: #fff;
+    height: 0;
+}
+
+
+/*定义右下角汇合处的样式*/
+
+::-webkit-scrollbar-corner {
+    background: #fff;
+}
+
+.detail-con {
+    padding: 0 50px;
+}
+
+//详情页副标题
+.sub-title-bar {
+    height: 70px;
+    line-height: 70px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .sub-t {
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 24px;
+        color: rgba(0, 0, 0, 0.85);
+        opacity: 1;
+    }
+}
+
+.quarantine-line {
+    width: 100%;
+    height: 1px;
+    background-color: #e8e8e8;
+    margin: 0 auto;
+    margin-bottom: 5px;
+}
+
+.el-table th {
+    background-color: #F5F7F9 !important;
+}
+
+.el-dialog__header {
+    border-bottom: 1px solid #ccc;
+    // background-color: #d9e0df;
+    padding: 15px 20px 10px;
+}
+
+.green {
+    @include flex;
+    span {
+        @include status(#67C23A);
+    }
+}
+
+.red {
+    @include flex;
+    span {
+        @include status(#F5222D);
+    }
+}
+
+.p-blue {
+    color: #4285F4;
+}
+
+.el-tabs__item:focus.is-active.is-focus:not(:active) {
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+}
+
+.el-tabs__item {
+    box-shadow: none !important;
+}
+
+.tabNews .el-tabs__item:focus.is-active.is-focus:not(:active) {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.el-tabs__item:focus.is-active.is-focus:not(:active) {
+    box-shadow: none;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+.disabled-from .el-select .el-input.is-disabled .el-input__inner,
+.disabled-from .el-input.is-disabled .el-input__inner {
+    border: none;
+    color: #606266;
+    background-color: #fff;
+    font-size: 14px;
+}
+
+.el-message {
+    min-width: 225px !important;
+}

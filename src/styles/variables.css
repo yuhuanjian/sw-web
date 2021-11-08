@@ -1,0 +1,13 @@
+:export {
+  menuText: rgba(255, 255, 255, 0.6);
+  menuActiveText: #fff;
+  subMenuActiveText: #fff;
+  menuBg: #1f263e;
+  menuHover: #303750;
+  subMenuBg: #1f263e;
+  subMenuHover: #303750;
+  sideBarWidth: 216px;
+  navBg: #fff;
+  activeTextColor: #4285F4;
+  textColor: #1F263E;
+}
