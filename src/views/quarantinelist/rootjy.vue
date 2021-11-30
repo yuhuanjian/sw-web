@@ -350,7 +350,7 @@
             >
               <el-option
                 v-if="ruleForm.sequence == 1"
-                label="卸车前死亡"
+                label="待宰前死亡"
                 value="1"
               />
               <el-option v-if="ruleForm.sequence == 2" label="急宰" value="2" />
@@ -362,7 +362,7 @@
 
               <el-option
                 v-if="ruleForm.sequence == 2"
-                label="待宰前死亡"
+                label="待宰期间死亡"
                 value="4"
               />
               <el-option

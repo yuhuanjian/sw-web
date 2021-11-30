@@ -54,6 +54,18 @@ import { setTimeout } from 'timers';
             </el-select>
           </el-form-item>
           <el-form-item
+            label="货主代表:"
+            :label-width="formLabelWidth"
+            prop="owners"
+          >
+            <el-input
+              v-model.trim="ruleForm.owners"
+              autocomplete="off"
+              style="width: 460px"
+              placeholder="请输入货主代表"
+            />
+          </el-form-item>
+          <el-form-item
             label="产地:"
             :label-width="formLabelWidth"
             prop="origin"
@@ -202,61 +214,7 @@ import { setTimeout } from 'timers';
               style="width: 460px"
               placeholder="请输入动物检疫合格证明编号"
             />
-          </el-form-item>
-          <el-form-item
-            label="产地:"
-            :label-width="formLabelWidth"
-            prop="origin"
-          >
-            <el-select
-              v-model="ruleForm.origin"
-              placeholder="请选择省"
-              style="width: 140px; margin-right: 20px"
-              @change="changeOrign($event)"
-            >
-              <el-option
-                v-for="(item, index) in getProvinceList"
-                :key="item.code"
-                :label="item.name"
-                :value="index"
-              />
-            </el-select>
-            <el-select
-              v-model="ruleForm.city"
-              :disabled="
-                ruleForm.origin === undefined || ruleForm.origin === ''
-                  ? true
-                  : false
-              "
-              placeholder="请选择市"
-              style="width: 140px; margin-right: 20px"
-              @change="changeCity"
-            >
-              <el-option
-                v-for="(item, index) in getCityList"
-                :key="index"
-                :label="item.name"
-                :value="index"
-              />
-            </el-select>
-            <el-select
-              v-model="ruleForm.county"
-              placeholder="请选择区"
-              :disabled="
-                ruleForm.city === undefined || ruleForm.city === ''
-                  ? true
-                  : false
-              "
-              style="width: 140px"
-            >
-              <el-option
-                v-for="(item, index) in getCountyList"
-                :key="index"
-                :label="item.name"
-                :value="item.name"
-              />
-            </el-select>
-          </el-form-item>
+          </el-form-item>          
           <div class="title">
             <div class="title-right">
               <div class="shu" />
@@ -460,6 +418,9 @@ export default {
         ],
         enterTime: [
           { required: true, message: '请选择进厂时间', trigger: 'change' }
+        ],
+        owners: [
+          { required: true, message: '请填写货主代表', trigger: 'change'}
         ]
       },
       farmNameList: [],
