@@ -86,8 +86,7 @@ export default {
     return {
       formSearch: {
         enterTime: '',
-        shipper: '',
-        branchId: ''
+        shipper: ''
       },
       total: 200,      
       listQuery: {
@@ -102,8 +101,7 @@ export default {
       SelectionList: [],
       gatherExportVisible: false,
       gatherExportForm: {
-        enterTime: '',
-        branchId: ''
+        enterTime: ''
       }
     }
   },

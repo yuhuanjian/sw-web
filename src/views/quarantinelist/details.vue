@@ -585,10 +585,10 @@
               :show-overflow-tooltip="true"
             >
               <template slot-scope="scope">
-                <p v-if="scope.row.abnormalType === 1">卸车前死亡</p>
+                <p v-if="scope.row.abnormalType === 1">待宰前死亡</p>
                 <p v-if="scope.row.abnormalType === 2">急宰</p>
                 <p v-if="scope.row.abnormalType === 3">急宰不合格</p>
-                <p v-if="scope.row.abnormalType === 4">待宰前死亡</p>
+                <p v-if="scope.row.abnormalType === 4">待宰期间死亡</p>
                 <p v-if="scope.row.abnormalType === 5">检疫不合格</p>
                 <p v-if="scope.row.abnormalType === 6">病料</p>
               </template>

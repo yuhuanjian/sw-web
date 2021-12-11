@@ -101,8 +101,7 @@ export default {
       SelectionList: [],
       gatherExportVisible: false,
       gatherExportForm: {
-        enterTime: '',
-        branchId: ''
+        enterTime: ''
       }
     }
   },
@@ -114,7 +113,7 @@ export default {
     //月度汇总导出
     exportReportFormsGather: _.debounce(function() {
       window.location.href = exportReportForms3Gather(
-        `selectDate=${this.formSearch.enterTime}&shipper=${this.formSearch.shipper}&branchId=${this.formSearch.branchId}`
+        `selectDate=${this.gatherExportForm.enterTime}&shipper=${this.gatherExportForm.shipper}&branchId=${this.gatherExportForm.branchId}`
       )
     },500),
     //导出

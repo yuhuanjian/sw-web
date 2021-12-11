@@ -40,6 +40,10 @@ import { setTimeout } from 'timers';
               <span class="cont-right"> {{ order.wholesaler }} </span>
             </div>
             <div class="cont-content">
+              <span class="cont-title"> 货主代表： </span>
+              <span class="cont-right"> {{ order.owners }} </span>
+            </div>
+            <div class="cont-content">
               <span class="cont-title"> 进厂时间： </span>
               <span class="cont-right"> {{ order.enterTime }} </span>
             </div>
@@ -345,13 +349,13 @@ import { setTimeout } from 'timers';
                 <template slot-scope="scope">
                   {{
                     scope.row.abnormalType === 1
-                      ? '卸车前死亡'
+                      ? '待宰前死亡'
                       : scope.row.abnormalType === 2
                         ? '急宰'
                         : scope.row.abnormalType === 3
                           ? '急宰不合格'
                           : scope.row.abnormalType === 4
-                            ? '待宰前死亡'
+                            ? '待宰期间死亡'
                             : scope.row.abnormalType === 5
                               ? '检疫不合格'
                               : '病料'

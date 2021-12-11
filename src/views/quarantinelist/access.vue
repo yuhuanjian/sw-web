@@ -299,7 +299,7 @@
             prop="abnormalType"
           >
             <el-select v-model="ruleForm.abnormalType" placeholder="请选择">
-              <el-option label="卸车前死亡" value="1" />
+              <el-option label="待宰前死亡" value="1" />
             </el-select>
           </el-form-item>
 
