@@ -1,10 +1,11 @@
-<!-- 宰前报表-无害化处理表 -->
+<!-- 无害化汇总表-无害化处理统计 -->
 <template>
   <div ref="main" class="dashboard-container">
     <div ref="search" class="search-wrap">      
       <el-form :inline="true" :model="formSearch" class="demo-form-inline">
         <el-form-item>
-          <el-date-picker v-model="formSearch.enterTime" type="date" value-format="yyyy-MM-dd HH:mm:ss" placeholder="进厂日期"/>
+          <!-- <el-date-picker v-model="formSearch.enterTime" type="date" value-format="yyyy-MM-dd HH:mm:ss" placeholder="进厂日期"/> -->
+          <el-date-picker v-model="formSearch.pickDate" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" format="yyyy-MM-dd HH:mm" range-separator="至" start-placeholder="起始进厂日期" end-placeholder="截止进厂日期" />
         </el-form-item>
         <el-form-item label="">
           <el-input v-model="formSearch.shipper" placeholder="请输入货主名称"/>
@@ -26,16 +27,18 @@
       <div/>
       <div>
         <el-button type="primary" icon="el-icon-upload2" @click="openGatherExportDialog" >月度汇总导出</el-button>
-        <el-button type="primary" con="el-icon-upload2" @click="exportReportForms" >导出</el-button>
+        <el-button type="primary" con="el-icon-upload2" @click="exportReportForms" >公示表导出</el-button>
       </div>
     </div>
     <TableWrap>
       <el-table :data="tableData" border stripe style="width: 100%" height="100%">
         <el-table-column prop="enterTime" label="进厂日期" :show-overflow-tooltip="true"/>
         <el-table-column prop="shipper" label="货主" :show-overflow-tooltip="true"/>
-        <el-table-column prop="disposeCause" label="处理原因" :show-overflow-tooltip="true"/>
-        <el-table-column prop="disposeNum" label="处理头数" :show-overflow-tooltip="true"/>
-        <el-table-column prop="disposeManner" label="处理方式" :show-overflow-tooltip="true"/>
+        <el-table-column prop="sickPigNum" label="病害猪头数（头）" :show-overflow-tooltip="true"/>
+        <el-table-column prop="illWeight" label="病害猪产品重量（公斤）" :show-overflow-tooltip="true"/>
+        <el-table-column prop="convertNum" label="折合头数（头）" :show-overflow-tooltip="true"/>
+        <el-table-column prop="preKillPigNum" label="待宰前死亡生猪头数（头）" :show-overflow-tooltip="true"/>
+        <el-table-column prop="disposeSickPigNum" label="病害猪无害化处理头数合计（头）" :show-overflow-tooltip="true"/>
         <el-table-column  prop="branchName"  label="网点机构" :show-overflow-tooltip="true"/>
       </el-table>
       <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList"/>
@@ -58,7 +61,7 @@
         <el-button @click="gatherExportVisible = false">取消</el-button>
         <el-button type="primary" @click="exportReportFormsGather">确定</el-button>
       </span>
-    </el-dialog>
+    </el-dialog>  
   </div>
 </template>
 
@@ -66,11 +69,11 @@
 import TableWrap from '@/components/TableWrap';
 import Pagination from '@/components/pagination';
 import {
-  queryReportForms1
+  queryReportForms4
 } from '@/api/reportForms';
 import {
-  exportReportForms1,
-  exportReportForms1Gather
+  exportReportForms4Public,
+  exportReportForms4Gather
 } from '@/api/reportFormsExport';
 import { getKeyStr } from '@/utils/Data';
 import _ from 'lodash';
@@ -86,7 +89,10 @@ export default {
     return {
       formSearch: {
         enterTime: '',
-        shipper: ''
+        shipper: '',
+        startDate: '',
+        endDate: '',
+        pickDate: ''
       },
       total: 200,      
       listQuery: {
@@ -112,14 +118,26 @@ export default {
   methods: {
     //月度汇总导出
     exportReportFormsGather: _.debounce(function() {
-      window.location.href = exportReportForms1Gather(
-        `selectDate=${this.gatherExportForm.enterTime}&branchId=${this.gatherExportForm.branchId}`
+      if(this.gatherExportForm.branchId===null||this.gatherExportForm.branchId===''||this.gatherExportForm.branchId===undefined){
+        this.$message.warning('请选择网点机构');
+        return;
+      }
+      window.location.href = exportReportForms4Gather(
+        `selectDate=${this.gatherExportForm.enterTime}&shipper=${this.gatherExportForm.shipper}&branchId=${this.gatherExportForm.branchId}`
       )
     },500),
     //导出
     exportReportForms: _.debounce(function () {
-      window.location.href = exportReportForms1(
-        `enterTime=${this.formSearch.enterTime}&shipper=${this.formSearch.shipper}&branchId=${this.formSearch.branchId}`
+      if(this.formSearch.branchId===null||this.formSearch.branchId===''||this.formSearch.branchId===undefined){
+        this.$message.warning('请选择网点机构');
+        return;
+      }
+      if(this.formSearch.pickDate!==null&&this.formSearch.pickDate.length>0&&this.formSearch.pickDate!==undefined) {
+        this.formSearch.startDate = this.formSearch.pickDate[0];
+        this.formSearch.endDate = this.formSearch.pickDate[1];
+      }
+      window.location.href = exportReportForms4Public(
+        `enterTime=${this.formSearch.enterTime}&shipper=${this.formSearch.shipper}&branchId=${this.formSearch.branchId}&startTime=${this.formSearch.startDate}&endTime=${this.formSearch.endDate}`
       )
     },500),
     // 多选框
@@ -133,15 +151,21 @@ export default {
       this.formSearch.branchId = localStorage.getItem('userTypeSW') === '0' ? '' : localStorage.getItem('nowbranchDropDown');
       this.listQuery.page = 1;
       this.listQuery.limit = 10;
-      this.getList()
+      this.getList();
     },
     getList() {
-      queryReportForms1({
+      if(this.formSearch.pickDate!==null&&this.formSearch.pickDate.length>0&&this.formSearch.pickDate!==undefined) {
+        this.formSearch.startDate = this.formSearch.pickDate[0];
+        this.formSearch.endDate = this.formSearch.pickDate[1];
+      }
+      queryReportForms4({
         branchId: this.formSearch.branchId,
         enterTime: this.formSearch.enterTime,
         shipper: this.formSearch.shipper,
         pageNum: this.listQuery.page,
-        pageSize: this.listQuery.limit
+        pageSize: this.listQuery.limit,
+        startTime: this.formSearch.startDate,
+        endTime: this.formSearch.endDate
       }).then(res => {
         this.$nextTick(() => {
           this.total = res.result.total

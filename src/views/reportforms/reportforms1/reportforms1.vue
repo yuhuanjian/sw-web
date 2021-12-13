@@ -1,10 +1,11 @@
-<!-- 猪产品报表-无害化处理表 -->
+<!-- 宰前报表-无害化处理表 -->
 <template>
   <div ref="main" class="dashboard-container">
     <div ref="search" class="search-wrap">      
       <el-form :inline="true" :model="formSearch" class="demo-form-inline">
         <el-form-item>
-          <el-date-picker v-model="formSearch.enterTime" type="date" value-format="yyyy-MM-dd HH:mm:ss" placeholder="进厂日期"/>
+          <!-- <el-date-picker v-model="formSearch.enterTime" type="date" value-format="yyyy-MM-dd HH:mm:ss" placeholder="进厂日期"/> -->
+          <el-date-picker v-model="formSearch.pickDate" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" format="yyyy-MM-dd HH:mm" range-separator="至" start-placeholder="起始进厂日期" end-placeholder="截止进厂日期" />
         </el-form-item>
         <el-form-item label="">
           <el-input v-model="formSearch.shipper" placeholder="请输入货主名称"/>
@@ -33,9 +34,8 @@
       <el-table :data="tableData" border stripe style="width: 100%" height="100%">
         <el-table-column prop="enterTime" label="进厂日期" :show-overflow-tooltip="true"/>
         <el-table-column prop="shipper" label="货主" :show-overflow-tooltip="true"/>
-        <el-table-column prop="placeName" label="产品（部位）名称" :show-overflow-tooltip="true"/>
-        <el-table-column prop="illWeight" label="处理数量（公斤）" :show-overflow-tooltip="true"/>
-        <el-table-column prop="convertNum" label="折合头数" :show-overflow-tooltip="true"/>
+        <el-table-column prop="disposeCause" label="处理原因" :show-overflow-tooltip="true"/>
+        <el-table-column prop="disposeNum" label="处理头数" :show-overflow-tooltip="true"/>
         <el-table-column prop="disposeManner" label="处理方式" :show-overflow-tooltip="true"/>
         <el-table-column  prop="branchName"  label="网点机构" :show-overflow-tooltip="true"/>
       </el-table>
@@ -46,7 +46,7 @@
       <el-form :model="gatherExportForm">
         <el-form-item label="网点机构">
           <el-select v-model="gatherExportForm.branchId" filterable :disabled="isshowBtn!=='0'" placeholder="请选择网点机构" @change="changeBranch">
-            <el-option v-for="item in branchList" :key="item.id" :label="item.branchName" :value="item.id" />
+            <el-option v-for="item in branchListA" :key="item.id" :label="item.branchName" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="请选择需要导出汇总表的月份：">
@@ -67,11 +67,11 @@
 import TableWrap from '@/components/TableWrap';
 import Pagination from '@/components/pagination';
 import {
-  queryReportForms2
+  queryReportForms1
 } from '@/api/reportForms';
 import {
-  exportReportForms2,
-  exportReportForms2Gather
+  exportReportForms1,
+  exportReportForms1Gather
 } from '@/api/reportFormsExport';
 import { getKeyStr } from '@/utils/Data';
 import _ from 'lodash';
@@ -87,7 +87,10 @@ export default {
     return {
       formSearch: {
         enterTime: '',
-        shipper: ''
+        shipper: '',
+        startDate: '',
+        endDate: '',
+        pickDate: ''
       },
       total: 200,      
       listQuery: {
@@ -111,16 +114,28 @@ export default {
     this.getList()
   },
   methods: {
-    //月度汇总导出
+    //月度汇总导出    
     exportReportFormsGather: _.debounce(function() {
-      window.location.href = exportReportForms2Gather(
-        `selectDate=${this.gatherExportForm.enterTime}&shipper=${this.gatherExportForm.shipper}&branchId=${this.gatherExportForm.branchId}`
+      if(this.gatherExportForm.branchId===null||this.gatherExportForm.branchId===''||this.gatherExportForm.branchId===undefined){
+        this.$message.warning('请选择网点机构');
+        return;
+      }
+      window.location.href = exportReportForms1Gather(
+        `selectDate=${this.gatherExportForm.enterTime}&branchId=${this.gatherExportForm.branchId}`
       )
     },500),
     //导出
     exportReportForms: _.debounce(function () {
-      window.location.href = exportReportForms2(
-        `enterTime=${this.formSearch.enterTime}&shipper=${this.formSearch.shipper}&branchId=${this.formSearch.branchId}`
+      if(this.formSearch.branchId===null||this.formSearch.branchId===''||this.formSearch.branchId===undefined){
+        this.$message.warning('请选择网点机构');
+        return;
+      }
+      if(this.formSearch.pickDate!==null&&this.formSearch.pickDate.length>0&&this.formSearch.pickDate!==undefined) {
+        this.formSearch.startDate = this.formSearch.pickDate[0];
+        this.formSearch.endDate = this.formSearch.pickDate[1];
+      }
+      window.location.href = exportReportForms1(
+        `enterTime=${this.formSearch.enterTime}&shipper=${this.formSearch.shipper}&branchId=${this.formSearch.branchId}&startTime=${this.formSearch.startDate}&endTime=${this.formSearch.endDate}`
       )
     },500),
     // 多选框
@@ -134,15 +149,21 @@ export default {
       this.formSearch.branchId = localStorage.getItem('userTypeSW') === '0' ? '' : localStorage.getItem('nowbranchDropDown');
       this.listQuery.page = 1;
       this.listQuery.limit = 10;
-      this.getList();
+      this.getList()
     },
     getList() {
-      queryReportForms2({
+      if(this.formSearch.pickDate!==null&&this.formSearch.pickDate.length>0&&this.formSearch.pickDate!==undefined) {
+        this.formSearch.startDate = this.formSearch.pickDate[0];
+        this.formSearch.endDate = this.formSearch.pickDate[1];
+      }
+      queryReportForms1({
         branchId: this.formSearch.branchId,
         enterTime: this.formSearch.enterTime,
         shipper: this.formSearch.shipper,
         pageNum: this.listQuery.page,
-        pageSize: this.listQuery.limit
+        pageSize: this.listQuery.limit,
+        startTime: this.formSearch.startDate,
+        endTime: this.formSearch.endDate
       }).then(res => {
         this.$nextTick(() => {
           this.total = res.result.total

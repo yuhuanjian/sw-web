@@ -15,6 +15,7 @@
     <!-- <div class="quarantine-line" /> -->
     <div ref="search" class="search-wrap">
       <el-form :inline="true" :model="formSearch" class="demo-form-inline">
+        <el-row>
         <el-form-item label="">
           <el-input
             v-model="formSearch.orderNum"
@@ -48,7 +49,24 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item>
+          <el-button type="text" @click="showSearch = !showSearch">{{showSearch?"收起":"展开"}}<i :class="showSearch?'el-icon-arrow-up':'el-icon-arrow-down'"></i></el-button>
+          <el-button
+            v-has="'allowEnterQuarantine:query'"
+            type="primary"
+            icon="el-icon-search"
+            @click="inquire(formSearch)"
+          >查询</el-button>
+          <el-button
+            type="primary"
+            icon="el-icon-refresh"
+            plain
+            @click="reset"
+          >重置</el-button>
+        </el-form-item>
+
+        </el-row>
+        <el-form-item label="" v-show="showSearch">
           <el-select
             v-model="formSearch.farmName"
             placeholder="养殖场名称"
@@ -62,19 +80,19 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="" v-show="showSearch">
           <el-input
             v-model="formSearch.pickupPlateNumbers"
             placeholder="请输入车牌号"
           />
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="" v-show="showSearch">
           <el-input
             v-model="formSearch.pickupOddNum"
             placeholder="请输入提货单号"
           />
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="" v-show="showSearch">
           <el-date-picker
             v-model="formSearch.enterTime"
             type="daterange"
@@ -85,7 +103,7 @@
             end-placeholder="进厂结束日期"
           />
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="" v-show="showSearch">
           <el-select v-model="formSearch.branchId" filterable :disabled="isshowBtn!=='0'" placeholder="请选择网点机构" @change="changeBranch">
             <el-option
               v-for="item in branchList"
@@ -94,20 +112,6 @@
               :value="item.id"
             />
           </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            v-has="'allowEnterQuarantine:query'"
-            type="primary"
-            icon="el-icon-search"
-            @click="inquire(formSearch)"
-          >查询</el-button>
-          <el-button
-            type="primary"
-            icon="el-icon-refresh"
-            plain
-            @click="reset"
-          >重置</el-button>
         </el-form-item>
       </el-form>
       <div class="line-s" />
@@ -492,7 +496,8 @@ export default {
       enterTime: '',
       wholesalerList: [],
       practicalEnterNum: 0,
-      orderNum: ''
+      orderNum: '',
+      showSearch: false
     }
   },
   created() {

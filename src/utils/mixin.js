@@ -15,8 +15,8 @@ export const branchDropDown = {
   },
   async created() {
     const response = await branch.sampleBranchDropDown()
-    this.branchList = response.result
-    this.branchListA = JSON.parse(JSON.stringify(response.result))
+    this.branchList = response.result;
+    this.branchListA = JSON.parse(JSON.stringify(response.result));
     console.log('created-userBranchId-'+localStorage.getItem('nowbranchDropDown'))
     if (this.branchList && this.branchList.length) {
       this.branchList.forEach(v => {
@@ -25,11 +25,18 @@ export const branchDropDown = {
         }
       })
     }
+    if (this.branchListA && this.branchListA.length) {
+      for(var i  = 0;i < this.branchListA.length;i++){
+        if(this.branchListA[i].level === 0) {
+          this.branchListA.splice(i,1);
+        }
+      }
+    }
   },
  async activated () {
     const response = await branch.sampleBranchDropDown()
-    this.branchList = response.result
-    this.branchListA = JSON.parse(JSON.stringify(response.result))
+    this.branchList = response.result;
+    this.branchListA = JSON.parse(JSON.stringify(response.result));
     console.log('activated-userBranchId-'+localStorage.getItem('nowbranchDropDown'))
     if (this.branchList && this.branchList.length) {
       this.branchList.forEach(v => {
@@ -37,6 +44,13 @@ export const branchDropDown = {
           v.id = '';
         }
       })
+    }
+    if (this.branchListA && this.branchListA.length) {
+      for(var i  = 0;i < this.branchListA.length;i++){
+        if(this.branchListA[i].level === 0) {
+          this.branchListA.splice(i,1);
+        }
+      }
     }
   },
   methods: {

@@ -12,6 +12,7 @@ import { setTimeout } from 'timers';
     <!-- 查询 -->
     <div ref="search" class="search-wrap">
       <el-form :inline="true" :model="formSearch" class="demo-form-inline">
+        <el-row>
         <el-form-item label="">
           <el-input
             v-model="formSearch.orderNum"
@@ -49,7 +50,23 @@ import { setTimeout } from 'timers';
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item>
+          <el-button type="text" @click="showSearch = !showSearch">{{showSearch?"收起":"展开"}}<i :class="showSearch?'el-icon-arrow-up':'el-icon-arrow-down'"></i></el-button>
+          <el-button
+            v-has="'ordersMana:query'"
+            type="primary"
+            icon="el-icon-search"
+            @click="submitForm('formSearch')"
+          >查询</el-button>
+          <el-button
+            type="primary"
+            icon="el-icon-refresh"
+            plain
+            @click="resetForm('formSearch')"
+          >重置</el-button>
+        </el-form-item>
+        </el-row>
+        <el-form-item label="" v-show="showSearch">
           <el-date-picker
             v-model="formSearch.enterTime"
             type="daterange"
@@ -60,7 +77,7 @@ import { setTimeout } from 'timers';
             end-placeholder="进厂结束日期"
           />
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="" v-show="showSearch">
           <el-select v-model="formSearch.orderStatus" placeholder="订单状态">
             <el-option label="新订单" value="1" />
             <el-option label="提货中" value="2" />
@@ -73,7 +90,7 @@ import { setTimeout } from 'timers';
             <el-option label="订单完成" value="9" />
           </el-select>
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="" v-show="showSearch">
           <el-select
             v-model="formSearch.quarantineStatus"
             placeholder="检疫状态"
@@ -89,7 +106,7 @@ import { setTimeout } from 'timers';
             <el-option label="准出检疫-异常" value="9" />
           </el-select>
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="" v-show="showSearch">
           <el-select v-model="formSearch.dispathStatus" placeholder="调度状态">
             <el-option label="提货未调度" value="1" />
             <el-option label="提货已调度" value="2" />
@@ -97,7 +114,7 @@ import { setTimeout } from 'timers';
             <el-option label="配送已调度" value="4" />
           </el-select>
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="" v-show="showSearch">
           <el-select
             v-model="formSearch.transportationStatus"
             placeholder="运输状态"
@@ -113,20 +130,20 @@ import { setTimeout } from 'timers';
             <el-option label="送货完成" value="9" />
           </el-select>
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="" v-show="showSearch">
           <el-input
             v-model="formSearch.pickupOddNum"
             placeholder="请输入提货单号"
           />
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="" v-show="showSearch">
           <el-input
             v-model="formSearch.pickupPlateNumbers"
             placeholder="请输入提货车牌号"
           />
         </el-form-item>
 
-        <el-form-item label="">
+        <el-form-item label="" v-show="showSearch">
           <el-select
             v-model="formSearch.pickupDriver"
             placeholder="提货司机"
@@ -140,13 +157,13 @@ import { setTimeout } from 'timers';
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="" v-show="showSearch">
           <el-input
             v-model="formSearch.pickupDriverPhone"
             placeholder="请输入司机联系方式"
           />
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label="" v-show="showSearch">
           <el-select v-model="formSearch.branchId" filterable :disabled="isshowBtn!=='0'" placeholder="请选择网点机构" @change="changeBranch">
             <el-option
               v-for="item in branchList"
@@ -155,23 +172,7 @@ import { setTimeout } from 'timers';
               :value="item.id"
             />
           </el-select>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button
-            v-has="'ordersMana:query'"
-            type="primary"
-            icon="el-icon-search"
-            @click="submitForm('formSearch')"
-          >查询</el-button>
-          <el-button
-            type="primary"
-            icon="el-icon-refresh"
-            plain
-            @click="resetForm('formSearch')"
-          >重置</el-button>
-        </el-form-item>
-
+        </el-form-item>        
       </el-form>
       <div class="line-s" />
     </div>
@@ -483,6 +484,7 @@ import { setTimeout } from 'timers';
       destroy-on-close
       :visible.sync="eidtFormVisible"
       width="1100px"
+      @close="closeDialog"
     >
       <div ref="detailinfowrap" class="detailinfo-wrap">
         <div ref="orderMess">
@@ -581,14 +583,18 @@ import { setTimeout } from 'timers';
                 />
               </el-form-item>
             </el-form>
-            <div class="DataList-cun">
-              可交易数：
-              {{ list.yesDeal }}只
-            </div>
-            <div class="DataList-cun">
-              已交易数：
-              {{ list.noDeal }}只
-            </div>
+            <el-button
+              size="small"
+              type="primary"
+              icon="el-icon-plus"
+              @click="addMultyHang(idx)"
+            >添加同数行</el-button>
+            <el-button
+              size="small"
+              type="primary"
+              icon="el-icon-plus"
+              @click="addHang(idx)"
+            >新增单行</el-button>
             <el-button
               v-if="idx === 0"
               size="small"
@@ -603,12 +609,6 @@ import { setTimeout } from 'timers';
               icon="el-icon-delete"
               @click="deletewholesaler(idx)"
             >删除批发商</el-button>
-            <el-button
-              size="small"
-              type="primary"
-              icon="el-icon-plus"
-              @click="addHang(idx)"
-            >新增行</el-button>
           </div>
           <el-table
             :data="list.saveCertManListRequestDTO"
@@ -710,12 +710,18 @@ import { setTimeout } from 'timers';
         </div>
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="eidtFormVisible = false">取消</el-button>
+        <el-col :span="12" style="text-align:left;">
+        <span style="font-size: 14px;margin-right: 30px;">可交易数：{{this.yesDeal}}只</span>
+        <span style="font-size: 14px;">已交易数：{{this.noDeal}}只</span>
+        </el-col>
+        <el-col :span="12">
+        <el-button size="mini" @click="closeDialog">取消</el-button>
         <el-button
           size="mini"
           type="primary"
           @click="resetCarInfo('ruleForm')"
         >确定</el-button>
+        </el-col>
       </div>
     </el-dialog>
     <deleteDloag ref="deleteDloag" @confirmDel="confirmDel" />
@@ -819,8 +825,8 @@ export default {
         }
       ],
       orderId: '',
-      yesDeal: '',
-      noDeal: '',
+      yesDeal: 0,
+      noDeal: 0,
       detailsData: {
         // 详情数据
         baseRouter: {
@@ -876,7 +882,8 @@ export default {
       fatherCode: '',
       merchatAllData: [],
       fathermerchantId: '',
-      wholesalerListALL: []
+      wholesalerListALL: [],
+      showSearch: false
     }
   },
   created() {
@@ -900,7 +907,12 @@ export default {
   methods: {
     dealNum(val, idx) {
       console.log(val, idx)
-      this.DataList[idx].yesDeal = val - this.DataList[idx].noDeal
+      this.DataList[idx].yesDeal = val - this.DataList[idx].noDeal;
+      var yes = 0;
+      this.DataList.forEach(v => {
+        yes += v.yesDeal;
+      });
+      this.yesDeal = yes;
     },
     clickwholesaler(val, idx) {
       this.wholesalerList = this.wholesalerListALL
@@ -1138,14 +1150,19 @@ export default {
           }
         })
       } else {
-        this.DataList[idx].noDeal = this.DataList[
-          idx
-        ].saveCertManListRequestDTO[0].purchaseQuantity
+        this.DataList[idx].noDeal = this.DataList[idx].saveCertManListRequestDTO[0].purchaseQuantity
 
         this.$forceUpdate()
       }
-      this.DataList[idx].yesDeal =
-        this.DataList[idx].actualEnterNum - this.DataList[idx].noDeal
+      this.DataList[idx].yesDeal = this.DataList[idx].actualEnterNum - this.DataList[idx].noDeal;
+      var no = 0;
+      var yes = 0;
+      this.DataList.forEach(v => {
+        no += v.noDeal;
+        yes += v.yesDeal;
+      });
+      this.yesDeal = yes;
+      this.noDeal = no;
     },
     handleCommand(val, index, idx) {
       this.getDeal(idx)
@@ -1639,12 +1656,34 @@ export default {
           }
         }
       })
+    },
+    addMultyHang(idx) {
+      var hangEnterNum = this.DataList[idx].actualEnterNum;
+      if(hangEnterNum!==undefined &&hangEnterNum!==null&&hangEnterNum!='') {
+        if(hangEnterNum > 10) {
+          this.$message.warning('添加行数超过10行，已自动添加10行，请手动添加剩余行数！');
+          hangEnterNum = 10;
+        }
+        for(var i = 0;i<hangEnterNum-1;i++) {
+          this.addHang(idx);
+        }
+      }      
+    },
+    closeDialog() {
+      this.eidtFormVisible = false;
+      this.yesDeal = 0;
+      this.noDeal = 0;
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.dialog-footer {
+  padding-bottom: 30px;
+  font-size: 14px;
+  color: #606266;
+}
 .DataList {
   display: flex;
   align-items: center;

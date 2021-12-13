@@ -4,7 +4,8 @@
     <div ref="search" class="search-wrap">      
       <el-form :inline="true" :model="formSearch" class="demo-form-inline">
         <el-form-item>
-          <el-date-picker v-model="formSearch.enterTime" type="date" value-format="yyyy-MM-dd HH:mm:ss" placeholder="进厂日期"/>
+          <!-- <el-date-picker v-model="formSearch.enterTime" type="date" value-format="yyyy-MM-dd HH:mm:ss" placeholder="进厂日期"/> -->
+          <el-date-picker v-model="formSearch.pickDate" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" format="yyyy-MM-dd HH:mm" range-separator="至" start-placeholder="起始进厂日期" end-placeholder="截止进厂日期" />
         </el-form-item>
         <el-form-item label="">
           <el-input v-model="formSearch.shipper" placeholder="请输入货主名称"/>
@@ -70,7 +71,10 @@ export default {
     return {
       formSearch: {
         enterTime: '',
-        shipper: ''
+        shipper: '',
+        startDate: '',
+        endDate: '',
+        pickDate: ''
       },
       total: 200,      
       listQuery: {
@@ -92,8 +96,16 @@ export default {
   methods: {
     //导出
     exportReportForms: _.debounce(function () {
+      if(this.formSearch.branchId===null||this.formSearch.branchId===''||this.formSearch.branchId===undefined){
+        this.$message.warning('请选择网点机构');
+        return;
+      }
+      if(this.formSearch.pickDate!==null&&this.formSearch.pickDate.length>0&&this.formSearch.pickDate!==undefined) {
+        this.formSearch.startDate = this.formSearch.pickDate[0];
+        this.formSearch.endDate = this.formSearch.pickDate[1];
+      }
       window.location.href = exportReportForms6(
-        `enterTime=${this.formSearch.enterTime}&shipper=${this.formSearch.shipper}&branchId=${this.formSearch.branchId}`
+        `enterTime=${this.formSearch.enterTime}&shipper=${this.formSearch.shipper}&branchId=${this.formSearch.branchId}&startTime=${this.formSearch.startDate}&endTime=${this.formSearch.endDate}`
       )
     },500),
     // 多选框
@@ -110,12 +122,18 @@ export default {
       this.getList();
     },
     getList() {
+      if(this.formSearch.pickDate!==null&&this.formSearch.pickDate.length>0&&this.formSearch.pickDate!==undefined) {
+        this.formSearch.startDate = this.formSearch.pickDate[0];
+        this.formSearch.endDate = this.formSearch.pickDate[1];
+      }
       queryReportForms6({
         branchId: this.formSearch.branchId,
         enterTime: this.formSearch.enterTime,
         shipper: this.formSearch.shipper,
         pageNum: this.listQuery.page,
-        pageSize: this.listQuery.limit
+        pageSize: this.listQuery.limit,
+        startTime: this.formSearch.startDate,
+        endTime: this.formSearch.endDate
       }).then(res => {
         this.$nextTick(() => {
           this.total = res.result.total
