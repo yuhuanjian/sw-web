@@ -125,6 +125,7 @@ export default {
       window.location.href = exportReportForms4Gather(
         `selectDate=${this.gatherExportForm.enterTime}&shipper=${this.gatherExportForm.shipper}&branchId=${this.gatherExportForm.branchId}`
       )
+      this.gatherExportVisible = false;
     },500),
     //导出
     exportReportForms: _.debounce(function () {

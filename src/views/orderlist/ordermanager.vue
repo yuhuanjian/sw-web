@@ -627,12 +627,15 @@ import { setTimeout } from 'timers';
                   placeholder="请选择"
                   @change="handleCommand($event, scope.$index, idx)"
                   @focus="clickCmerchantCode(scope.$index, idx)"
+                  
+                  @visible-change="merchantDropDownClose($event,scope.$index, idx)"
                 >
                   <el-option
-                    v-for="(item, index) in restaurants"
+                    v-for="(item, index) in merchants[idx]"
                     :key="index"
                     :label="item.merchantCode"
-                    :value="JSON.stringify(item)"
+                    v-show="!item.isChecked"
+                    :value="item"
                   />
                   <span slot="empty">
                     <p style=" text-align: center;line-height: 50px;">
@@ -883,12 +886,14 @@ export default {
       merchatAllData: [],
       fathermerchantId: '',
       wholesalerListALL: [],
-      showSearch: false
+      showSearch: false,
+      merchants: []
     }
   },
   created() {
     OrderApi.postqueryAllRoutedMerchant().then(res => {
       this.restaurants = res.result
+      this.merchants.push(JSON.parse(JSON.stringify(this.restaurants)));
       this.merchantCodeList = res.result
     })
     dropDownfarm().then(res => {
@@ -927,7 +932,7 @@ export default {
         }
       })
       console.log(this.wholesalerList)
-      if (this.restaurants.length > 0) {
+      if (this.merchants[idx].filter(v => !v.isChecked).length > 0) {
         this.titleMessage = ''
       } else {
         this.titleMessage = '无匹配数据'
@@ -1059,29 +1064,46 @@ export default {
       this.$refs.points.innerVisible = false
       this.$refs.points.rest()
     },
-    clickCmerchantCode(index, idx) {
-      this.restaurants = this.merchantCodeList
-      this.DataList[idx].saveCertManListRequestDTO.forEach((v, i) => {
-        if (v.merchantCode == '') {
-          console.log(v)
-        } else {
-          this.restaurants = this.restaurants.filter(
-            o => o.merchantCode != v.merchantCode
-          )
-        }
-      })
-      this.merchantCodeList.forEach(v => {
+    clickCmerchantCode(index, idx) {      
+      // this.restaurants = this.merchantCodeList
+      // this.DataList[idx].saveCertManListRequestDTO.forEach((v, i) => {
+      //   if (v.merchantCode == '') {
+      //     console.log(v)
+      //   } else {
+      //     this.restaurants = this.restaurants.filter(
+      //       o => o.merchantCode != v.merchantCode
+      //     )
+      //   }
+      // })
+      var currentMerchants = this.merchants[idx];
+      currentMerchants.forEach(v => {
         if (
           this.DataList[idx].saveCertManListRequestDTO[index].merchantCode ===
           v.merchantCode
         ) {
-          this.restaurants.unshift(v)
+          v.isChecked = false;
+          return;
         }
       })
-      if (this.restaurants.length > 0) {
+      if (currentMerchants.filter(v => !v.isChecked).length > 0) {
         this.titleMessage = ''
       } else {
         this.titleMessage = '无匹配数据'
+      }
+    },
+    merchantDropDownClose(callback,index,idx) {      
+      if(!callback) {
+        //下拉框隐藏触发
+        var currentMerchants = this.merchants[idx];
+        currentMerchants.forEach(v => {
+          if (
+            this.DataList[idx].saveCertManListRequestDTO[index].merchantCode ===
+            v.merchantCode
+          ) {
+            v.isChecked = true;
+            return;
+          }
+        });
       }
     },
     // 去重
@@ -1103,13 +1125,16 @@ export default {
       return result
     },
     deltableMerchant(index, idx) {
-      this.DataList[idx].saveCertManListRequestDTO.splice(index, 1)
-      // this.confirmPoints([])
+      var merchantId = this.DataList[idx].saveCertManListRequestDTO[index].merchantId;
+      this.merchants[idx].forEach(v => {
+        if(v.merchantId === merchantId) {
+          v.isChecked = false;
+        }
+      });
+      this.DataList[idx].saveCertManListRequestDTO.splice(index, 1);
       this.DataList[idx].saveCertManListRequestDTO.forEach(v => {
         v.addMerchantPigDetailsRequestDto.forEach((z, x) => {
-          const findidx = this.DataList[
-            idx
-          ].saveCertManListRequestDTO.findIndex(
+          const findidx = this.DataList[idx].saveCertManListRequestDTO.findIndex(
             e => e.merchantCode === z.merchantCode
           )
           if (findidx === -1) {
@@ -1118,7 +1143,8 @@ export default {
           }
         })
       })
-      this.getDeal(idx)
+      this.getDeal(idx);
+
     },
     changepurchaseQuantity(idx) {
       console.log(idx)
@@ -1164,9 +1190,22 @@ export default {
       this.yesDeal = yes;
       this.noDeal = no;
     },
-    handleCommand(val, index, idx) {
-      this.getDeal(idx)
-      val = JSON.parse(val)
+    handleCommand(val, index, idx) { 
+      this.getDeal(idx);
+      var currentMerchants = this.merchants[idx];
+      for(var i = 0;i < currentMerchants.length;i++) {
+        if(currentMerchants[i].merchantId === val.merchantId) {
+          console.log(currentMerchants[i].merchantId);
+          currentMerchants[i].isChecked = !currentMerchants[i].isChecked;
+          break;
+        }
+      }
+      // this.restaurants.forEach(v => {
+      //   if(v.merchantId === val.merchantId) {
+      //     console.log(v.merchantId);
+      //     v.isChecked = true;
+      //   }
+      // });
       val.purchaseQuantity = this.DataList[idx].saveCertManListRequestDTO[
         index
       ].purchaseQuantity
@@ -1174,9 +1213,7 @@ export default {
       this.DataList[idx].saveCertManListRequestDTO.splice(index, 1, val)
       this.DataList[idx].saveCertManListRequestDTO.forEach(v => {
         v.addMerchantPigDetailsRequestDto.forEach((z, x) => {
-          const findidx = this.DataList[
-            idx
-          ].saveCertManListRequestDTO.findIndex(
+          const findidx = this.DataList[idx].saveCertManListRequestDTO.findIndex(
             e => e.merchantCode === z.merchantCode
           )
           if (findidx === -1) {
@@ -1198,7 +1235,7 @@ export default {
     },
     querySearch(queryString, cb) {
       OrderApi.postdropDownmerchant().then(res => {
-        this.restaurants = res.result
+        this.restaurants = res.result;
         cb(res.result)
       })
     },
@@ -1393,10 +1430,12 @@ export default {
       this.detailsData.baseRouter.abnormalNum = obj.abnormalNum
       this.detailsData.baseRouter.enterTime = obj.enterTime
       this.detailsData.baseRouter.pickupPlateNumbers = obj.pickupPlateNumbers
+
+      this.merchants.push(JSON.parse(JSON.stringify(this.restaurants)));
       dropDownwholesaler().then(res => {
         this.wholesalerList = res.result
         this.eidtFormVisible = true
-      })
+      });
     },
     // 交易确定
     resetCarInfo: _.debounce(function() {
@@ -1584,7 +1623,10 @@ export default {
         this.$message.success('交易成功')
         this.eidtFormVisible = false
         this.submitForm()
-      })
+      });
+      this.yesDeal = 0;
+      this.noDeal = 0;
+      this.merchants = [];
     }, 200),
     // 交易列表删除数据
     del(val) {
@@ -1620,16 +1662,18 @@ export default {
           this.$refs.detailinfowrap.scrollTop = this.$refs.detailinfowrap.scrollHeight - 500
         }
       })
+      this.merchants.push(JSON.parse(JSON.stringify(this.restaurants)));
     },
     deletewholesaler(idx) {
       this.deletewholesaleridx = idx
       this.$refs.deleteDloag.title = '确认提示'
       this.$refs.deleteDloag.message =
         '当前批发商的交易将不会保存，是否确认删除？'
-      this.$refs.deleteDloag.innerVisible = true
+      this.$refs.deleteDloag.innerVisible = true      
     },
     confirmDel() {
       this.DataList.splice(this.deletewholesaleridx, 1)
+      this.merchants.splice(this.deletewholesaleridx, 1);
     },
     // 新增行
     addHang(idx) {
@@ -1643,19 +1687,19 @@ export default {
         purchaseQuantity: 1,
         addMerchantPigDetailsRequestDto: []
       })
-      this.$nextTick(() => {
-        if (this.$refs.detailinfowrap.scrollHeight > 470) {
-          if (this.DataList.length == 1) {
-            this.$refs.detailinfowrap.scrollTop = this.$refs.detailinfowrap.scrollHeight - 500
-          } else {
-            var heightAll = 0
-            for (let i = 0; i <= idx; i++) {
-              heightAll += this.$refs.tableorder[i].scrollHeight + 20
-            }
-            this.$refs.detailinfowrap.scrollTop = heightAll + this.$refs.orderMess.scrollHeight - 500
-          }
-        }
-      })
+      // this.$nextTick(() => {
+      //   if (this.$refs.detailinfowrap.scrollHeight > 470) {
+      //     if (this.DataList.length == 1) {
+      //       this.$refs.detailinfowrap.scrollTop = this.$refs.detailinfowrap.scrollHeight - 500
+      //     } else {
+      //       var heightAll = 0
+      //       for (let i = 0; i <= idx; i++) {
+      //         heightAll += this.$refs.tableorder[i].scrollHeight + 20
+      //       }
+      //       this.$refs.detailinfowrap.scrollTop = heightAll + this.$refs.orderMess.scrollHeight - 500
+      //     }
+      //   }
+      // })
     },
     addMultyHang(idx) {
       var hangEnterNum = this.DataList[idx].actualEnterNum;
@@ -1673,6 +1717,7 @@ export default {
       this.eidtFormVisible = false;
       this.yesDeal = 0;
       this.noDeal = 0;
+      this.merchants = [];
     }
   }
 }

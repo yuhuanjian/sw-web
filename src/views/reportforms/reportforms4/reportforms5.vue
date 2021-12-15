@@ -126,8 +126,9 @@ export default {
         this.formSearch.endDate = this.formSearch.pickDate[1];
       }
       window.location.href = exportReportForms5(
-        `enterTime=${this.gatherExportForm.enterTime}&branchId=${this.gatherExportForm.branchId}&startTime=${this.formSearch.startDate}&endTime=${this.formSearch.endDate}`
+        `enterTime=${this.gatherExportForm.enterTime}&branchId=${this.gatherExportForm.branchId}&startTime=${this.formSearch.startDate}&endTime=${this.formSearch.endDate}&shipper=`
       )
+      this.gatherExportVisible = false;
     },500),
     // 多选框
     handleSelectionChange(val) {
